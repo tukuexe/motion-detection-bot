@@ -1,0 +1,25 @@
+name: Motion Detected
+
+on:
+  repository_dispatch:
+    types: [motion_detected]
+
+jobs:
+  send-telegram-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decode image
+        id: decode_image
+        run: |
+          echo "IMAGE_DATA=${{ github.event.client_payload.image }}" >> $GITHUB_ENV
+
+      - name: Save image
+        run: |
+          echo "$IMAGE_DATA" | base64 --decode > screenshot.png
+
+      - name: Send message to Telegram
+        run: |
+          curl -s -X POST https://api.telegram.org/bot7609668402:AAGWOLDkkQIAEzXqL75TjtD6vAQqaLgehM4/sendPhoto \
+          -F chat_id=6715819149 \
+          -F photo="@screenshot.png" \
+          -F caption="Motion detected!"
